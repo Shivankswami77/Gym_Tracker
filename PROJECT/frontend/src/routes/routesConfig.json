@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "path": "/sign-in",
+      "element": "Login",
+      "protected": false,
+      "redirectTo": "/dashboard"
+    },
+    {
+      "path": "/forgot-password",
+      "element": "ForgotPassword",
+      "protected": false,
+      "redirectTo": "/dashboard"
+    },
+    {
+      "path": "/home",
+      "element": "Home",
+      "protected": true,
+      "layout": "HeaderNav"
+    },
+    {
+      "path": "/dashboard",
+      "element": "Dashboard",
+      "protected": true,
+      "layout": "HeaderNav"
+    }
+  ]
+}
