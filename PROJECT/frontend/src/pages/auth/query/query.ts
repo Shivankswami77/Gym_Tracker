@@ -22,6 +22,20 @@ const useLogin = () => {
     }
   );
 };
+const useRegister = () => {
+  return useMutation(
+    async (resgisterPayload: { email: string; password: string }) => {
+      return http.post(URLs.UserRegister, resgisterPayload, undefined, {
+        "Public-Request": "true",
+      });
+    },
+    {
+      onError: (error: any) => {
+        toast("Registration failed");
+      },
+    }
+  );
+};
 const useGetLoggedInUserProfile = () => {
   // const { setLoggedInUserProfile, setLoggedInUserDetails } =
   //   useGetLoggedInUserDetailsStore();
@@ -45,4 +59,4 @@ const useGetLoggedInUserProfile = () => {
   );
 };
 
-export { useLogin, useGetLoggedInUserProfile };
+export { useLogin, useRegister, useGetLoggedInUserProfile };

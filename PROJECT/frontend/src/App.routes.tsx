@@ -12,6 +12,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import SignIn from "@src/pages/auth/sign-in";
 import { ToastContainer } from "react-toastify";
 import useAuthStore from "./store/authStore";
+import SignUp from "./pages/auth/sign-up";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App: React.FC = () => {
             <Routes>
               {/* Public Route: SignIn */}
               <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
 
               {/* Protected Route: Home */}
               <Route

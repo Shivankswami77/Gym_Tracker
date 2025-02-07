@@ -50,6 +50,7 @@ const register = async (req, res) => {
 
   const user = new customerModel({
     name: name,
+    username: name,
     email: email,
     password: bcryptt.hashSync(password),
     profile: profile,

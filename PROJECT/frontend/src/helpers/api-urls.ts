@@ -4,6 +4,7 @@ import { EHttpMethod, IService } from "./types";
 
 export const URLs = {
   UserLogin: "/api/users/signin",
+  UserRegister: "/api/register",
   UserResetPasswordLink: "/user-auth/reset-password-link",
   ResetPassword: "/user-auth/reset-password",
   LoggedUserProfile: "/user-auth/profile",

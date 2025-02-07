@@ -7,13 +7,13 @@ import {
   FormLabel,
   Heading,
   Input,
-  Link,
   Switch,
+  Link,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
 import signInImage from "@src/assets/images/signInImage.png";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link as RouterLink, Navigate, useNavigate } from "react-router-dom";
 import { useLogin } from "./query/query";
 import { SetLocalStorage } from "@src/helpers/common";
 import useAuthStore from "@src/store/authStore";
@@ -129,6 +129,7 @@ const SignIn: React.FC = () => {
                 <Button
                   fontSize="10px"
                   type="submit"
+                  isLoading={loading}
                   bg="teal.300"
                   w="100%"
                   h="45"
@@ -152,7 +153,7 @@ const SignIn: React.FC = () => {
               <Text color={textColor} fontWeight="medium">
                 Don't have an account?
                 <Link color={titleColor} as="span" ms="5px" fontWeight="bold">
-                  Sign Up
+                  <RouterLink to={"/sign-up"}> Sign Up</RouterLink>
                 </Link>
               </Text>
             </Flex>

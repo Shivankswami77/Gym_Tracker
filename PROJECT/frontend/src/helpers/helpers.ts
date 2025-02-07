@@ -1,6 +1,3 @@
-import React from "react";
-import { URLs } from "./api-urls";
-
 import dayjs from "dayjs";
 import CryptoJS from "crypto-js";
 
