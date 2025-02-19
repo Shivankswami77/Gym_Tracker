@@ -117,7 +117,7 @@ export default function HeaderNav() {
                       >
                         <Avatar
                           name={userDetails.name}
-                          src="https://bit.ly/tioluwani-kolawole"
+                          src={userDetails.profilePicture}
                           size={"md"}
                         />
                       </MenuButton>
@@ -127,7 +127,7 @@ export default function HeaderNav() {
                           <Avatar
                             name={userDetails.name}
                             size={"md"}
-                            src="https://bit.ly/tioluwani-kolawole"
+                            src={userDetails.profilePicture}
                           />
                         </Center>
                         <br />
