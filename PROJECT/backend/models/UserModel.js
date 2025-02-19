@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     weight: { type: String, required: false },
     height: { type: String, required: false },
     bmi: { type: String, required: false },
-
+    profilePicture: String,
     isAdmin: { type: Boolean, default: false, required: false },
     isCoach: { type: Boolean, default: false, required: false },
     isDoctor: { type: Boolean, default: false, required: false },

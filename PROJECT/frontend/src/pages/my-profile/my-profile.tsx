@@ -10,6 +10,7 @@ import {
   VStack,
   useToast,
   Text,
+  Image as ImageComponent,
 } from "@chakra-ui/react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
@@ -51,10 +52,62 @@ const MyProfileForm: React.FC = () => {
       getUserDetailsById(params.id, {
         onSuccess: (response: any) => {
           setUserDetails(response);
+          if (response.profilePicture) setImagePreview(response.profilePicture);
         },
       });
     }
   }, [params.id]);
+
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const handleImageUpload = (event: any, setFieldValue: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload an image file (jpeg, jpg, png).",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e: any) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const scaleSize = 200;
+          canvas.width = scaleSize;
+          canvas.height = (img.height / img.width) * scaleSize;
+          ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Convert to Base64
+          const base64Image = canvas.toDataURL("image/jpeg", 0.7);
+
+          // Check size after conversion
+          const byteSize = base64Image.length * (3 / 4) - 2;
+          if (byteSize <= 50000) {
+            setFieldValue("profilePicture", base64Image);
+            setImagePreview(base64Image);
+          } else {
+            toast({
+              title: "Image too large",
+              description: "Please upload an image under 50KB.",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        };
+      };
+    }
+  };
 
   const calculateBMI = (height: number, weight: number) => {
     if (height > 0 && weight > 0) {
@@ -66,6 +119,7 @@ const MyProfileForm: React.FC = () => {
   };
 
   const handleSubmit = (values: any) => {
+    console.log(values, "'values");
     updateUserDetailsById(
       { userId: userDetails._id, ...values, bmi },
       {
@@ -98,6 +152,7 @@ const MyProfileForm: React.FC = () => {
           address: userDetails?.address || "",
           height: userDetails?.height || "",
           weight: userDetails?.weight || "",
+          profilePicture: null,
         }}
         enableReinitialize
         validationSchema={validationSchema}
@@ -193,6 +248,26 @@ const MyProfileForm: React.FC = () => {
                 />
                 {errors.height && touched.height && (
                   <Text color="red.500">{errors.height}</Text>
+                )}
+              </FormControl>
+              <FormControl>
+                <FormLabel>Profile Picture</FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, setFieldValue)}
+                />
+
+                {imagePreview && (
+                  <ImageComponent
+                    src={imagePreview}
+                    alt="Profile Preview"
+                    boxSize="100px"
+                    mt={2}
+                  />
+                )}
+                {errors.profilePicture && touched.profilePicture && (
+                  <Text color="red.500">{errors.profilePicture}</Text>
                 )}
               </FormControl>
               {bmi !== null && (
