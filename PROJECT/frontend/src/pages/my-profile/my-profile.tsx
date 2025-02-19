@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -10,13 +9,13 @@ import {
   Select,
   VStack,
   useToast,
+  Text,
 } from "@chakra-ui/react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useGetUserDetailsById, useUpdateUserProfile } from "./query/query";
 import { useParams } from "react-router-dom";
 
-// Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   age: Yup.number()
@@ -28,31 +27,47 @@ const validationSchema = Yup.object().shape({
   phone: Yup.string()
     .matches(/^\d{10}$/, "Phone must be 10 digits")
     .required("Phone is required"),
-  address: Yup.string().required("Address is required"),
+  height: Yup.number()
+    .required("Height is required")
+    .min(50, "Invalid height")
+    .max(250, "Invalid height"),
+  weight: Yup.number()
+    .required("Weight is required")
+    .min(10, "Invalid weight")
+    .max(300, "Invalid weight"),
 });
 
 const MyProfileForm: React.FC = () => {
   const toast = useToast();
-  const { mutate: getUserDetailsById, isLoading: loading } =
-    useGetUserDetailsById();
+  const { mutate: getUserDetailsById } = useGetUserDetailsById();
   const { mutate: updateUserDetailsById, isLoading: submitUserDetailsLoading } =
     useUpdateUserProfile();
   const params = useParams();
   const [userDetails, setUserDetails] = useState<any>({});
+  const [bmi, setBmi] = useState<number | null>(null);
+
   useEffect(() => {
     if (params.id) {
       getUserDetailsById(params.id, {
         onSuccess: (response: any) => {
-          console.log(response);
           setUserDetails(response);
         },
       });
     }
   }, [params.id]);
+
+  const calculateBMI = (height: number, weight: number) => {
+    if (height > 0 && weight > 0) {
+      const bmiValue = (weight / ((height / 100) * (height / 100))).toFixed(2);
+      setBmi(parseFloat(bmiValue));
+    } else {
+      setBmi(null);
+    }
+  };
+
   const handleSubmit = (values: any) => {
-    console.log("Form Submitted:", values);
     updateUserDetailsById(
-      { userId: userDetails._id, ...values },
+      { userId: userDetails._id, ...values, bmi },
       {
         onSuccess: (response) => {
           setUserDetails(response);
@@ -67,6 +82,7 @@ const MyProfileForm: React.FC = () => {
       }
     );
   };
+
   return (
     <Box p={6} maxW="500px" mx="auto" backgroundColor={"#FFF"}>
       <Heading mb={6} textAlign="center">
@@ -80,21 +96,21 @@ const MyProfileForm: React.FC = () => {
           email: userDetails?.email || "",
           phone: userDetails?.phone || "",
           address: userDetails?.address || "",
+          height: userDetails?.height || "",
+          weight: userDetails?.weight || "",
         }}
         enableReinitialize
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, isSubmitting }) => (
+        {({ values, errors, touched, setFieldValue }) => (
           <Form>
             <VStack spacing={4}>
               <FormControl>
                 <FormLabel>Name</FormLabel>
                 <Field as={Input} name="name" placeholder="Enter your name" />
                 {errors.name && touched.name && (
-                  <Box color="red.500" fontSize="sm">
-                    {errors.name}
-                  </Box>
+                  <Text color="red.500">{errors.name}</Text>
                 )}
               </FormControl>
 
@@ -107,9 +123,7 @@ const MyProfileForm: React.FC = () => {
                   placeholder="Enter your age"
                 />
                 {errors.age && touched.age && (
-                  <Box color="red.500" fontSize="sm">
-                    {errors.age}
-                  </Box>
+                  <Text color="red.500">{errors.age}</Text>
                 )}
               </FormControl>
 
@@ -121,12 +135,9 @@ const MyProfileForm: React.FC = () => {
                   <option value="other">Other</option>
                 </Field>
                 {errors.gender && touched.gender && (
-                  <Box color="red.500" fontSize="sm">
-                    {errors.gender}
-                  </Box>
+                  <Text color="red.500">{errors.gender}</Text>
                 )}
               </FormControl>
-
               <FormControl>
                 <FormLabel>Email</FormLabel>
                 <Field
@@ -144,34 +155,51 @@ const MyProfileForm: React.FC = () => {
               </FormControl>
 
               <FormControl>
-                <FormLabel>Phone</FormLabel>
-                <Field
-                  as={Input}
-                  name="phone"
-                  type="text"
-                  placeholder="Enter your phone number"
-                />
-                {errors.phone && touched.phone && (
-                  <Box color="red.500" fontSize="sm">
-                    {errors.phone}
-                  </Box>
-                )}
-              </FormControl>
-
-              <FormControl>
                 <FormLabel>Address</FormLabel>
                 <Field
                   as={Input}
                   name="address"
                   placeholder="Enter your address"
                 />
-                {errors.address && touched.address && (
-                  <Box color="red.500" fontSize="sm">
-                    {errors.address}
-                  </Box>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Weight (kg)</FormLabel>
+                <Field
+                  as={Input}
+                  name="weight"
+                  type="number"
+                  placeholder="Enter weight in kg"
+                  onChange={(e: any) => {
+                    setFieldValue("weight", e.target.value);
+                    calculateBMI(Number(values.height), Number(e.target.value));
+                  }}
+                />
+                {errors.weight && touched.weight && (
+                  <Text color="red.500">{errors.weight}</Text>
                 )}
               </FormControl>
 
+              <FormControl>
+                <FormLabel>Height (cm)</FormLabel>
+                <Field
+                  as={Input}
+                  name="height"
+                  type="number"
+                  placeholder="Enter height in cm"
+                  onChange={(e: any) => {
+                    setFieldValue("height", e.target.value);
+                    calculateBMI(Number(e.target.value), Number(values.weight));
+                  }}
+                />
+                {errors.height && touched.height && (
+                  <Text color="red.500">{errors.height}</Text>
+                )}
+              </FormControl>
+              {bmi !== null && (
+                <Text fontSize="lg" color="teal.500">
+                  BMI: {bmi}
+                </Text>
+              )}
               <Button
                 type="submit"
                 colorScheme="teal"

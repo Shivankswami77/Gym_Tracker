@@ -6,6 +6,9 @@ const userSchema = new mongoose.Schema(
 
     age: { type: String, required: false },
     gender: { type: String, required: false },
+    weight: { type: String, required: false },
+    height: { type: String, required: false },
+    bmi: { type: String, required: false },
 
     isAdmin: { type: Boolean, default: false, required: false },
     isCoach: { type: Boolean, default: false, required: false },
