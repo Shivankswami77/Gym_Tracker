@@ -9,13 +9,13 @@ const nutrition_base = require("./routes/nutrition/nutrition_base");
 const onlineshop_base = require("./routes/onlineshop/onlineshop_base");
 const payment_base = require("./routes/payment/payment_base");
 const trainer_base = require("./routes/trainer/trainer_base");
+const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 
 //express app
 const app = express();
 
 //middleware
 app.use(express.json()); //to add json to the 'req' Object
-
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
@@ -29,6 +29,8 @@ app.use(morgan("dev")); //to run frontend and backend concurrently
 app.use(bodyParser.json());
 app.use(cors());
 
+// app.use(notFound);
+// app.use(errorHandler);
 //routes
 inventory_base(app);
 customer_base(app);

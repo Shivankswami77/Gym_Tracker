@@ -15,6 +15,14 @@ import {
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
+  MenuButton,
+  Menu,
+  Avatar,
+  MenuList,
+  Center,
+  MenuDivider,
+  MenuItem,
+  Link,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -25,20 +33,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useAuthStore from "@src/store/authStore";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function HeaderNav() {
+  const titleColor = useColorModeValue("teal.300", "teal.200");
+  const textColor = useColorModeValue("gray.400", "white");
   const { isOpen, onToggle } = useDisclosure();
   const navigate = useNavigate();
   const { userDetails } = useAuthStore();
-
-  console.log(userDetails, "userDetails");
-  useEffect(() => {
-    if (!userDetails?._id) {
-      navigate("/sign-in");
-    } else {
-      navigate("/");
-    }
-  }, []);
 
   const userLogout = () => {
     localStorage.clear();
@@ -72,6 +74,7 @@ export default function HeaderNav() {
             aria-label={"Toggle Navigation"}
           />
         </Flex>
+
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
           <Text
             // textAlign={useBreakpointValue({ base: "center", md: "left" })}
@@ -87,18 +90,62 @@ export default function HeaderNav() {
         </Flex>
         <Flex flex={{ base: 1 }} justify={"flex-end"}>
           {userDetails?._id ? (
-            <Button
-              as={"a"}
-              fontSize={"sm"}
-              fontWeight={600}
-              color={"white"}
-              cursor={"pointer"}
-              bg={"pink.400"}
-              _hover={{ bg: "pink.300" }}
-              onClick={userLogout}
-            >
-              Logout
-            </Button>
+            <Flex>
+              {" "}
+              <Button
+                as={"a"}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                cursor={"pointer"}
+                bg={"pink.400"}
+                _hover={{ bg: "pink.300" }}
+                onClick={userLogout}
+              >
+                Logout
+              </Button>
+              <Flex alignItems={"center"} justifyContent={"space-between"}>
+                <Flex alignItems={"center"}>
+                  <Stack direction={"row"} spacing={1}>
+                    <Menu>
+                      <MenuButton
+                        as={Button}
+                        rounded={"full"}
+                        variant={"link"}
+                        cursor={"pointer"}
+                        minW={0}
+                      >
+                        <Avatar
+                          name={userDetails.name}
+                          src="https://bit.ly/tioluwani-kolawole"
+                          size={"md"}
+                        />
+                      </MenuButton>
+                      <MenuList alignItems={"center"}>
+                        <br />
+                        <Center>
+                          <Avatar
+                            name={userDetails.name}
+                            size={"md"}
+                            src="https://bit.ly/tioluwani-kolawole"
+                          />
+                        </Center>
+                        <br />
+                        <MenuDivider />
+                        <MenuItem>
+                          {" "}
+                          <RouterLink to={`/my-profile/${userDetails._id}`}>
+                            {" "}
+                            My Profile
+                          </RouterLink>
+                        </MenuItem>
+                        <MenuItem>Logout</MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Stack>
+                </Flex>
+              </Flex>
+            </Flex>
           ) : (
             <Stack direction={"row"} spacing={6}>
               <Button

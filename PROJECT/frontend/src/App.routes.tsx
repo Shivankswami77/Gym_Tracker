@@ -13,6 +13,7 @@ import SignIn from "@src/pages/auth/sign-in";
 import { ToastContainer } from "react-toastify";
 import useAuthStore from "./store/authStore";
 import SignUp from "./pages/auth/sign-up";
+import MyProfile from "./pages/my-profile/my-profile";
 
 const queryClient = new QueryClient();
 
@@ -31,22 +32,18 @@ const App: React.FC = () => {
               <Route path="/sign-up" element={<SignUp />} />
 
               {/* Protected Route: Home */}
-              <Route
-                path="/"
-                element={
-                  userDetails?._id ? (
-                    <HeaderNav />
-                  ) : (
-                    <Navigate to="/sign-in" replace />
-                  )
-                }
-              />
+              <Route path="/" element={<HeaderNav />} />
 
               {/* Catch-all Route: Redirect unmatched routes */}
+
               <Route
-                path="*"
+                path="/my-profile/:id"
                 element={
-                  <Navigate to={userDetails?._id ? "/" : "/sign-in"} replace />
+                  <>
+                    {" "}
+                    <HeaderNav />
+                    <MyProfile />
+                  </>
                 }
               />
             </Routes>

@@ -15,13 +15,13 @@ userRouter
 userRouter.route("/login").post(controller.verifyUser, controller.login); //login in app
 
 //GET methods
-userRouter.route("/user/:username").get(controller.getUser); // user with username
+userRouter.route("/user/:id").get(controller.getUser); // user with username
 userRouter
   .route("/generateOTP")
   .get(controller.verifyUser, controller.localVariables); //generate random OTP
 
 //PUT methods
-userRouter.route("/updateUser/:id").patch(controller.updateUser); //use to update the user profile
+userRouter.route("/updateUser/:id").put(controller.updateUser); //use to update the user profile
 
 //DELETE method
 userRouter.route("/Customer_Dashboard").get((req, res) => {

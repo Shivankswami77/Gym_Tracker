@@ -8,6 +8,8 @@ export const URLs = {
   UserResetPasswordLink: "/user-auth/reset-password-link",
   ResetPassword: "/user-auth/reset-password",
   LoggedUserProfile: "/user-auth/profile",
+  GetUserDetails: (userId: string) => `/api/user/${userId}`,
+  UpdateUserDetails: (userId: string) => `/api/updateUser/${userId}`,
 };
 export const baseURL = "http://localhost:4000/";
 class HttpService {

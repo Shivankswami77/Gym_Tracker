@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const ENV = require("../routes/customer/config.js");
 const otpGenerator = require("otp-generator");
 const bcryptt = require("bcryptjs");
-
+const expressAsyncHandler = require("express-async-handler");
 // middleware for verifyUser
 const verifyUser = async (req, res, next) => {
   try {
@@ -58,21 +58,35 @@ const register = async (req, res) => {
   });
   // Check if the user already exists in the database
   const existingUser = await customerModel.findOne({
-    $or: [{ name }, { email }],
+    // $or: [{ name }, { email }],
+    email,
   });
   if (existingUser) {
-    return res.status(409).json({ message: "Name or email already exists" });
+    return res.status(409).json({ message: "Email already exists" });
   }
   try {
     await user.save();
-
-    res.send("User registered Successfully");
+    if (user) {
+      res.status(200).json({
+        _id: user._id,
+        name: user._name,
+        email: user.email,
+        isAdmin: false,
+        isCoach: false,
+        isDoctor: false,
+        isCustomer: true,
+        token: user.token,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid User Data");
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-const login = async (req, res) => {
+const login = expressAsyncHandler((req, res) => {
   const { name, password } = req.body;
 
   try {
@@ -113,29 +127,35 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).send(error);
   }
-};
+});
 
 /** GET: http://localhost:4000/api/user/:name */
-const getUser = async (req, res) => {
-  const { name } = req.params;
-  try {
-    if (!name) return res.status(501).send({ error: "Invalid Name." });
-    customerModel.findOne({ name }, function (err, user) {
-      if (err) return res.status(500).send({ err });
-      if (!user)
-        return res.status(501).send({ error: "Couldn't find the user" });
 
-      // remove the password from user
-      // mongoose return the unnecessary data with object  so convert it into json
-      const { password, ...rest } = Object.assign({}, user.toJSON());
-      return res.status(201).send(rest);
-    });
+const getUser = async (req, res) => {
+  const { id } = req.params;
+
+  // Check if ID is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send({ error: "Invalid User ID format" });
+  }
+
+  try {
+    const user = await customerModel.findById(id).lean(); // .lean() for plain JSON object
+
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    const { password, ...rest } = user;
+    res.status(200).json(rest);
   } catch (error) {
-    return res.status(404).send({ error: "Cannot find User data" });
+    console.error("Database Error:", error); // Log the actual error
+    res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
 const updateUser = async (req, res) => {
+  console.log(req.params, req.body, "DASSSSSSSSSSSSSSSS");
   try {
     const customer = await customerModel.findByIdAndUpdate(
       req.params.id,
