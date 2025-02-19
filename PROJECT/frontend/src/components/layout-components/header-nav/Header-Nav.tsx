@@ -90,62 +90,65 @@ export default function HeaderNav() {
         </Flex>
         <Flex flex={{ base: 1 }} justify={"flex-end"}>
           {userDetails?._id ? (
-            <Flex>
-              {" "}
-              <Button
-                as={"a"}
-                fontSize={"sm"}
-                fontWeight={600}
-                color={"white"}
-                cursor={"pointer"}
-                bg={"pink.400"}
-                _hover={{ bg: "pink.300" }}
-                onClick={userLogout}
-              >
-                Logout
-              </Button>
-              <Flex alignItems={"center"} justifyContent={"space-between"}>
-                <Flex alignItems={"center"}>
-                  <Stack direction={"row"} spacing={1}>
-                    <Menu>
-                      <MenuButton
-                        as={Button}
-                        rounded={"full"}
-                        variant={"link"}
-                        cursor={"pointer"}
-                        minW={0}
-                      >
-                        <Avatar
-                          name={userDetails.name}
-                          src={userDetails.profilePicture}
-                          size={"md"}
-                        />
-                      </MenuButton>
-                      <MenuList alignItems={"center"}>
-                        <br />
-                        <Center>
+            <Stack direction="row" gap="10">
+              <Flex>
+                {" "}
+                <Button
+                  as={"a"}
+                  fontSize={"sm"}
+                  fontWeight={600}
+                  color={"white"}
+                  cursor={"pointer"}
+                  bg={"pink.400"}
+                  _hover={{ bg: "pink.300" }}
+                  onClick={userLogout}
+                  marginRight={"0.5rem"}
+                >
+                  Logout
+                </Button>
+                <Flex alignItems={"center"} justifyContent={"space-between"}>
+                  <Flex alignItems={"center"}>
+                    <Stack direction={"row"} spacing={1}>
+                      <Menu>
+                        <MenuButton
+                          as={Button}
+                          rounded={"full"}
+                          variant={"link"}
+                          cursor={"pointer"}
+                          minW={0}
+                        >
                           <Avatar
                             name={userDetails.name}
-                            size={"md"}
                             src={userDetails.profilePicture}
+                            size={"md"}
                           />
-                        </Center>
-                        <br />
-                        <MenuDivider />
-                        <MenuItem>
-                          {" "}
-                          <RouterLink to={`/my-profile/${userDetails._id}`}>
+                        </MenuButton>
+                        <MenuList alignItems={"center"}>
+                          <br />
+                          <Center>
+                            <Avatar
+                              name={userDetails.name}
+                              size={"md"}
+                              src={userDetails.profilePicture}
+                            />
+                          </Center>
+                          <br />
+                          <MenuDivider />
+                          <MenuItem>
                             {" "}
-                            My Profile
-                          </RouterLink>
-                        </MenuItem>
-                        <MenuItem>Logout</MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </Stack>
+                            <RouterLink to={`/my-profile/${userDetails._id}`}>
+                              {" "}
+                              My Profile
+                            </RouterLink>
+                          </MenuItem>
+                          <MenuItem>Logout</MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </Stack>
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
+            </Stack>
           ) : (
             <Stack direction={"row"} spacing={6}>
               <Button
