@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useAuthStore from "@src/store/authStore";
 import { Link as RouterLink } from "react-router-dom";
+import RoleTag from "./gym-components/role-tag";
 
 export default function HeaderNav() {
   const titleColor = useColorModeValue("teal.300", "teal.200");
@@ -41,7 +42,7 @@ export default function HeaderNav() {
   const { isOpen, onToggle } = useDisclosure();
   const navigate = useNavigate();
   const { userDetails } = useAuthStore();
-
+  console.log(userDetails, "userDetails");
   const userLogout = () => {
     localStorage.clear();
     navigate("/sign-in");
@@ -138,7 +139,8 @@ export default function HeaderNav() {
                             {" "}
                             <RouterLink to={`/my-profile/${userDetails._id}`}>
                               {" "}
-                              My Profile
+                              My Profile (
+                              <RoleTag role={userDetails?.roleType} />)
                             </RouterLink>
                           </MenuItem>
                           <MenuItem>Logout</MenuItem>
@@ -385,7 +387,7 @@ const NAV_ITEMS: Array<NavItem> = [
     href: "#",
   },
   {
-    label: "Hire Designers",
-    href: "#",
+    label: "Users",
+    href: "/ds",
   },
 ];

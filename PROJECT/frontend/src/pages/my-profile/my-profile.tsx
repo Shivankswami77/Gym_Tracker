@@ -52,6 +52,7 @@ const MyProfileForm: React.FC = () => {
       getUserDetailsById(params.id, {
         onSuccess: (response: any) => {
           setUserDetails(response);
+          setBmi(response.bmi);
           if (response.profilePicture) setImagePreview(response.profilePicture);
         },
       });
@@ -152,7 +153,7 @@ const MyProfileForm: React.FC = () => {
           address: userDetails?.address || "",
           height: userDetails?.height || "",
           weight: userDetails?.weight || "",
-          profilePicture: null,
+          profilePicture: userDetails?.profilePicture || null,
         }}
         enableReinitialize
         validationSchema={validationSchema}
