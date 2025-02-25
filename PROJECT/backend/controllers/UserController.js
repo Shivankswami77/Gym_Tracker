@@ -75,8 +75,20 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Error fetching users", error });
   }
 };
+const deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "User Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+};
 
 module.exports = {
   signin,
   getAllUsers,
+  deleteUser,
 };
