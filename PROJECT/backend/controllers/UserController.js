@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const generateToken = require("../util.js");
 const signin = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
-  console.log(user);
   if (user) {
     if (bcrypt.compareSync(req.body.password, user.password)) {
       const roleMappings = {
@@ -39,9 +38,14 @@ const signin = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
   try {
-    const users = await User.find({}, "-password"); // Exclude password
-
+    const users = await User.find({}, "-password")
+      .skip((page - 1) * limit) // Skip documents for previous pages
+      .limit(limit) // Limit the number of documents
+      .lean(); // Exclude password
+    const totalUsers = await User.find({}, "-password").countDocuments();
     const roleMappings = {
       isAdmin: "Admin",
       isCoach: "Coach",
@@ -70,7 +74,7 @@ const getAllUsers = async (req, res) => {
       };
     });
 
-    res.status(200).json(formattedUsers);
+    res.status(200).json({ data: formattedUsers, totalRecords: totalUsers });
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }

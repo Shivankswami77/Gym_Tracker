@@ -24,7 +24,7 @@ const UsersList: React.FC = () => {
   useEffect(() => {
     getAllUsers(null, {
       onSuccess: (response: any) => {
-        setAllUsers(Array.isArray(response) ? response : []);
+        setAllUsers(Array.isArray(response.data) ? response.data : []);
       },
     });
   }, [refresh]);
