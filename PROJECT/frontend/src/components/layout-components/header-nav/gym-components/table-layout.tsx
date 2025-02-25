@@ -14,10 +14,6 @@ import {
 } from "@chakra-ui/react";
 import React, { JSX } from "react";
 
-import { useState } from "react";
-
-const PAGE_SIZE = 5;
-
 interface Column {
   key: string;
   label: string;
@@ -30,25 +26,22 @@ interface TableLayoutProps {
   data: any[];
   title: string;
   isLoading: boolean;
-  onPageChange?: (page: number) => void;
+  currentPage: number;
+  totalPages: number;
+  totalRecords: number;
+  onPageChange: (page: number) => void;
 }
 
 const TableLayout: React.FC<TableLayoutProps> = ({
   columns,
   data,
   title,
-  onPageChange,
   isLoading,
+  currentPage,
+  totalPages,
+  totalRecords,
+  onPageChange,
 }) => {
-  const [page, setPage] = useState<number>(1);
-  const totalPages = Math.ceil(data.length / PAGE_SIZE);
-  const paginatedData = data.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-    onPageChange?.(newPage);
-  };
-
   return (
     <Box borderWidth="1px" rounded="md" p={5} mx="auto">
       <Box
@@ -65,7 +58,7 @@ const TableLayout: React.FC<TableLayoutProps> = ({
 
         <Box overflowX="auto">
           <Table size="sm">
-            <Thead height={"2rem"}>
+            <Thead>
               <Tr bg="gray.100">
                 {columns.map((col) => (
                   <Th textAlign={col.textAlign || "left"} key={col.key}>
@@ -75,15 +68,16 @@ const TableLayout: React.FC<TableLayoutProps> = ({
               </Tr>
             </Thead>
             {isLoading ? (
-              <Spinner
-                position={"absolute"}
-                left={"50%"}
-                as={"span"}
-                size="md"
-              />
+              <Tbody>
+                <Tr>
+                  <Td colSpan={columns.length} textAlign="center">
+                    <Spinner size="md" />
+                  </Td>
+                </Tr>
+              </Tbody>
             ) : (
               <Tbody>
-                {paginatedData.map((item) => (
+                {data.map((item) => (
                   <Tr key={item._id}>
                     {columns.map((col) => (
                       <Td key={col.key} textAlign={col.textAlign || "left"}>
@@ -98,18 +92,20 @@ const TableLayout: React.FC<TableLayoutProps> = ({
         </Box>
 
         <HStack justifyContent="space-between" mt={4}>
+          <Text>Total Records: {totalRecords}</Text>{" "}
+          {/* Display total records */}
           <Button
-            onClick={() => handlePageChange(page - 1)}
-            isDisabled={page === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            isDisabled={currentPage === 1}
           >
             Previous
           </Button>
           <Text>
-            Page {page} of {totalPages}
+            Page {currentPage} of {totalPages}
           </Text>
           <Button
-            onClick={() => handlePageChange(page + 1)}
-            isDisabled={page === totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            isDisabled={currentPage === totalPages}
           >
             Next
           </Button>

@@ -8,8 +8,10 @@ const http = new HttpService();
 
 const useGetAllUsers = () => {
   return useMutation<any, AxiosError<ErrorResponse>, any>(
-    async () => {
-      const response: AxiosResponse<any> = await http.get(URLs.GetAllUsers);
+    async (pagination) => {
+      const response: AxiosResponse<any> = await http.get(
+        URLs.GetAllUsers(pagination.page, pagination.limit)
+      );
       return response;
     },
     {
