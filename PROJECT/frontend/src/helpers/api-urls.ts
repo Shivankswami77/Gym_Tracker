@@ -10,6 +10,7 @@ export const URLs = {
   LoggedUserProfile: "/user-auth/profile",
   GetUserDetails: (userId: string) => `/api/user/${userId}`,
   UpdateUserDetails: (userId: string) => `/api/updateUser/${userId}`,
+  GetAllUsers: `/api/users/all-users`,
 };
 export const baseURL = "http://localhost:4000/";
 class HttpService {

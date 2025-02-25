@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import useAuthStore from "./store/authStore";
 import SignUp from "./pages/auth/sign-up";
 import MyProfile from "./pages/my-profile/my-profile";
+import UsersList from "./pages/users/users-list";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,15 @@ const App: React.FC = () => {
                     {" "}
                     <HeaderNav />
                     <MyProfile />
+                  </>
+                }
+              />
+              <Route
+                path="/users-list"
+                element={
+                  <>
+                    <HeaderNav />
+                    <UsersList />
                   </>
                 }
               />

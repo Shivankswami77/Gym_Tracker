@@ -198,9 +198,9 @@ const DesktopNav = () => {
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
               <Box
-                as="a"
+                as={RouterLink}
                 p={2}
-                href={navItem.href ?? "#"}
+                to={navItem.href ?? "#"}
                 fontSize={"sm"}
                 fontWeight={500}
                 color={linkColor}
@@ -239,8 +239,8 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
     <Box
-      as="a"
-      href={href}
+      as={RouterLink}
+      to={href}
       role={"group"}
       display={"block"}
       p={2}
@@ -297,8 +297,8 @@ const MobileNavItem = ({ label, userLogout, children, href }: NavItem) => {
     <Stack spacing={4} onClick={children && onToggle}>
       <Box
         py={2}
-        as="a"
-        href={href ?? "#"}
+        as={RouterLink}
+        to={href ?? "#"}
         justifyContent="space-between"
         alignItems="center"
         _hover={{
@@ -388,6 +388,6 @@ const NAV_ITEMS: Array<NavItem> = [
   },
   {
     label: "Users",
-    href: "/ds",
+    href: "/users-list",
   },
 ];

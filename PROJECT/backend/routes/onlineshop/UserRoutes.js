@@ -5,7 +5,7 @@ const { signin, getAllUsers } = require("../../controllers/UserController.js");
 const userRouter = express.Router();
 
 userRouter.post("/signin", signin);
-userRouter.get("/users", getAllUsers);
+userRouter.get("/all-users", getAllUsers);
 
 // userRouter.post("/addCoach" , async(req , res) =>{
 //   const name = req.body.name
