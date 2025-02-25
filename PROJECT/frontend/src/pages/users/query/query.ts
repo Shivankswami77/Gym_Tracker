@@ -19,5 +19,20 @@ const useGetAllUsers = () => {
     }
   );
 };
+const useDeleteUser = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (userId) => {
+      const response: AxiosResponse<any> = await http.delete(
+        URLs.DeleteUser(userId)
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
 
-export { useGetAllUsers };
+export { useGetAllUsers, useDeleteUser };

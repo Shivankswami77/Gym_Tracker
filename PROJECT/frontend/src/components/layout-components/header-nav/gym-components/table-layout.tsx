@@ -10,6 +10,7 @@ import {
   HStack,
   Text,
   Heading,
+  Spinner,
 } from "@chakra-ui/react";
 import React, { JSX } from "react";
 
@@ -28,6 +29,7 @@ interface TableLayoutProps {
   columns: Column[];
   data: any[];
   title: string;
+  isLoading: boolean;
   onPageChange?: (page: number) => void;
 }
 
@@ -36,6 +38,7 @@ const TableLayout: React.FC<TableLayoutProps> = ({
   data,
   title,
   onPageChange,
+  isLoading,
 }) => {
   const [page, setPage] = useState<number>(1);
   const totalPages = Math.ceil(data.length / PAGE_SIZE);
@@ -71,17 +74,26 @@ const TableLayout: React.FC<TableLayoutProps> = ({
                 ))}
               </Tr>
             </Thead>
-            <Tbody>
-              {paginatedData.map((item) => (
-                <Tr key={item._id}>
-                  {columns.map((col) => (
-                    <Td key={col.key} textAlign={col.textAlign || "left"}>
-                      {col.render ? col.render(item) : item[col.key]}
-                    </Td>
-                  ))}
-                </Tr>
-              ))}
-            </Tbody>
+            {isLoading ? (
+              <Spinner
+                position={"absolute"}
+                left={"50%"}
+                as={"span"}
+                size="md"
+              />
+            ) : (
+              <Tbody>
+                {paginatedData.map((item) => (
+                  <Tr key={item._id}>
+                    {columns.map((col) => (
+                      <Td key={col.key} textAlign={col.textAlign || "left"}>
+                        {col.render ? col.render(item) : item[col.key]}
+                      </Td>
+                    ))}
+                  </Tr>
+                ))}
+              </Tbody>
+            )}
           </Table>
         </Box>
 

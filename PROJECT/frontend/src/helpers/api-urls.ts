@@ -11,6 +11,7 @@ export const URLs = {
   GetUserDetails: (userId: string) => `/api/user/${userId}`,
   UpdateUserDetails: (userId: string) => `/api/updateUser/${userId}`,
   GetAllUsers: `/api/users/all-users`,
+  DeleteUser: (userId: string) => `/api/users/${userId}`,
 };
 export const baseURL = "http://localhost:4000/";
 class HttpService {
@@ -82,6 +83,16 @@ class HttpService {
     hasAttachment = false
   ): Promise<T> {
     return this.request<T>(EHttpMethod.GET, url, {
+      params,
+      headers: this.setupHeaders(hasAttachment),
+    });
+  }
+  public async delete<T>(
+    url: string,
+    params?: IService.IParams | any,
+    hasAttachment = false
+  ): Promise<T> {
+    return this.request<T>(EHttpMethod.DELETE, url, {
       params,
       headers: this.setupHeaders(hasAttachment),
     });

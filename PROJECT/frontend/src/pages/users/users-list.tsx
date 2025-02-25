@@ -10,13 +10,15 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { HiEllipsisVertical } from "react-icons/hi2";
-import { useGetAllUsers } from "./query/query";
+import { useDeleteUser, useGetAllUsers } from "./query/query";
 import TableLayout from "@src/components/layout-components/header-nav/gym-components/table-layout";
 import FormModal from "@src/components/layout-components/header-nav/gym-components/modals/form-modal";
 
 const UsersList: React.FC = () => {
-  const { mutate: getAllUsers } = useGetAllUsers();
+  const { mutate: getAllUsers, isLoading } = useGetAllUsers();
+  const { mutate: deleteUser } = useDeleteUser();
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [refresh, setRefresh] = useState<number>(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -25,8 +27,15 @@ const UsersList: React.FC = () => {
         setAllUsers(Array.isArray(response) ? response : []);
       },
     });
-  }, []);
+  }, [refresh]);
 
+  const onClickDeleteUser = (userId: string) => {
+    deleteUser(userId, {
+      onSuccess: (response: any) => {
+        setRefresh((prev: number) => prev + 1);
+      },
+    });
+  };
   const columns = [
     { key: "name", label: "User Name" },
     { key: "email", label: "Email" },
@@ -44,7 +53,9 @@ const UsersList: React.FC = () => {
             </MenuButton>
             <MenuList>
               <MenuItem onClick={onOpen}>Edit</MenuItem>
-              <MenuItem>Delete</MenuItem>
+              <MenuItem onClick={() => onClickDeleteUser(item._id)}>
+                Delete
+              </MenuItem>
             </MenuList>
           </Menu>
         );
@@ -54,7 +65,12 @@ const UsersList: React.FC = () => {
 
   return (
     <>
-      <TableLayout columns={columns as any} data={allUsers} title="Users" />
+      <TableLayout
+        columns={columns as any}
+        data={allUsers}
+        title="Users"
+        isLoading={isLoading}
+      />
       <FormModal
         isOpen={isOpen}
         onClose={onClose}
