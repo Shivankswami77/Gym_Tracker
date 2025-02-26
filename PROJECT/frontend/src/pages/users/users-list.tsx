@@ -8,6 +8,15 @@ import {
   FormControl,
   FormLabel,
   Input,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Modal,
+  useToast,
 } from "@chakra-ui/react";
 import { HiEllipsisVertical } from "react-icons/hi2";
 import { useDeleteUser, useGetAllUsers } from "./query/query";
@@ -22,7 +31,16 @@ const UsersList: React.FC = () => {
   const [refresh, setRefresh] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(1);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const toast = useToast();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteUserModal,
+    onOpen: onOpenDeleteUserModal,
+    onClose: onCloseDeleteUserModal,
+    getDisclosureProps,
+  } = useDisclosure();
 
   const fetchUsers = (page: number) => {
     getAllUsers(
@@ -38,12 +56,25 @@ const UsersList: React.FC = () => {
 
   useEffect(() => {
     fetchUsers(currentPage);
-  }, [currentPage]);
+  }, [currentPage, refresh]);
 
+  const handleDeleteClick = (id: string) => {
+    setSelectedId(id);
+    onOpenDeleteUserModal();
+  };
   const onClickDeleteUser = (userId: string) => {
     deleteUser(userId, {
       onSuccess: (response: any) => {
+        setSelectedId("");
         setRefresh((prev: number) => prev + 1);
+        onCloseDeleteUserModal();
+        toast({
+          title: "Success",
+          description: "User Deleted",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       },
     });
   };
@@ -72,7 +103,7 @@ const UsersList: React.FC = () => {
             </MenuButton>
             <MenuList>
               <MenuItem onClick={onOpen}>Edit</MenuItem>
-              <MenuItem onClick={() => onClickDeleteUser(item._id)}>
+              <MenuItem onClick={() => handleDeleteClick(item._id)}>
                 Delete
               </MenuItem>
             </MenuList>
@@ -109,6 +140,33 @@ const UsersList: React.FC = () => {
           <Input placeholder="Last name" />
         </FormControl>
       </FormModal>
+      <Modal
+        closeOnOverlayClick={true}
+        isOpen={isOpenDeleteUserModal}
+        onClose={onCloseDeleteUserModal}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete User</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            Are you sure you want to delete? This operation can't be undone.
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              colorScheme="red"
+              mr={3}
+              onClick={() => {
+                onClickDeleteUser(selectedId);
+              }}
+            >
+              Delete
+            </Button>
+            <Button onClick={onCloseDeleteUserModal}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
