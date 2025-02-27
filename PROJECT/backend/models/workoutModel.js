@@ -1,71 +1,42 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const Schema = mongoose.Schema;
+const ExerciseSchema = new Schema(
+  {
+    // MongoDB automatically adds an _id field of type ObjectId.
 
-//workout schema
-const WorkoutSchema = new Schema({
-  username: {
-    type: String,
-    required: false,
-  },
-  coachername: {
-    type: String,
-    required: false,
-  },
+    // A numeric exercise ID, e.g., 2917
+    exerciseId: { type: Number, required: true, unique: true },
 
-  sheduleno: {
-    type: String,
-    required: false,
-  },
+    // Title: e.g., "30 Arms EZ-Bar Skullcrusher"
+    title: { type: String, required: true },
 
-  date: {
-    type: String,
-    required: false,
-  },
-  set1: {
-    type: String,
-    required: false,
-  },
-  set2: {
-    type: String,
-    required: false,
-  },
-  set3: {
-    type: String,
-    required: false,
-  },
-  set4: {
-    type: String,
-    required: false,
-  },
-  set5: {
-    type: String,
-    required: false,
-  },
-  set6: {
-    type: String,
-    required: false,
-  },
-  set7: {
-    type: String,
-    required: false,
-  },
-  set8: {
-    type: String,
-    required: false,
-  },
-  set9: {
-    type: String,
-    required: false,
-  },
-  set10: {
-    type: String,
-    required: false,
-  },
-});
+    // Description (optional)
+    desc: { type: String },
 
-const workout = mongoose.model("Workout", WorkoutSchema);
+    // Type: e.g., "Strength"
+    type: { type: String, required: true },
 
-//export module
-// module.exports = {Coach,validate};
-module.exports = workout;
+    // BodyPart: e.g., "Triceps"
+    bodyPart: { type: String, required: true },
+
+    // Equipment: e.g., "E-Z Curl Bar"
+    equipment: { type: String, required: true },
+
+    // Level: e.g., "Intermediate"
+    level: { type: String, required: true },
+
+    // Rating (optional)
+    rating: { type: String },
+
+    // Rating description (optional)
+    ratingDesc: { type: String },
+  },
+  { timestamps: true } // Optional: adds createdAt and updatedAt timestamps
+);
+
+module.exports = mongoose.model(
+  "workouts_data",
+  ExerciseSchema,
+  "workouts_data"
+);

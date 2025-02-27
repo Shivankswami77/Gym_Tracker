@@ -22,12 +22,14 @@ import { HiEllipsisVertical } from "react-icons/hi2";
 import { useDeleteUser, useGetAllUsers } from "./query/query";
 import TableLayout from "@src/components/layout-components/header-nav/gym-components/table-layout";
 import FormModal from "@src/components/layout-components/header-nav/gym-components/modals/form-modal";
+import { useNavigate } from "react-router-dom";
 
 const UsersList: React.FC = () => {
   const PAGE_LIMIT = 5;
   const { mutate: getAllUsers, isLoading } = useGetAllUsers();
   const { mutate: deleteUser } = useDeleteUser();
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const navigate = useNavigate();
   const [refresh, setRefresh] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(1);
@@ -39,7 +41,11 @@ const UsersList: React.FC = () => {
     isOpen: isOpenDeleteUserModal,
     onOpen: onOpenDeleteUserModal,
     onClose: onCloseDeleteUserModal,
-    getDisclosureProps,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenAssignUserWorkoutModal,
+    onOpen: onOpenAssignUserWorkoutModal,
+    onClose: onCloseAssignUserWorkoutModal,
   } = useDisclosure();
 
   const fetchUsers = (page: number) => {
@@ -103,6 +109,11 @@ const UsersList: React.FC = () => {
             </MenuButton>
             <MenuList>
               <MenuItem onClick={onOpen}>Edit</MenuItem>
+              <MenuItem
+                onClick={() => navigate(`/assign-workout-to-user/${item._id}`)}
+              >
+                Assign Workout
+              </MenuItem>
               <MenuItem onClick={() => handleDeleteClick(item._id)}>
                 Delete
               </MenuItem>

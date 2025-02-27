@@ -36,5 +36,18 @@ const useDeleteUser = () => {
     }
   );
 };
-
-export { useGetAllUsers, useDeleteUser };
+const useGetUserWorkoutPlan = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (pagination) => {
+      const response: AxiosResponse<any> = await http.get(pagination.url);
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+export { useGetAllUsers, useDeleteUser, useGetUserWorkoutPlan };

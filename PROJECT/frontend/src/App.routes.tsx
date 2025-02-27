@@ -15,6 +15,7 @@ import useAuthStore from "./store/authStore";
 import SignUp from "./pages/auth/sign-up";
 import MyProfile from "./pages/my-profile/my-profile";
 import UsersList from "./pages/users/users-list";
+import AssignWorkout from "./pages/users/assign-workout/assign-workout";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,15 @@ const App: React.FC = () => {
                   <>
                     <HeaderNav />
                     <UsersList />
+                  </>
+                }
+              />
+              <Route
+                path="/assign-workout-to-user/:id"
+                element={
+                  <>
+                    <HeaderNav />
+                    <AssignWorkout />
                   </>
                 }
               />

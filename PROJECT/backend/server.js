@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const inventory_base = require("./routes/inventory/inventory_base");
 const customer_base = require("./routes/customer/customer_base");
+const workout_base = require("./routes/workout/workout_base");
 const doctor_base = require("./routes/doctor/doctor_base");
 const fitness_base = require("./routes/fitness/fitness_base");
 const nutrition_base = require("./routes/nutrition/nutrition_base");
@@ -34,6 +35,7 @@ app.use(cors());
 //routes
 inventory_base(app);
 customer_base(app);
+workout_base(app);
 doctor_base(app);
 fitness_base(app);
 nutrition_base(app);
