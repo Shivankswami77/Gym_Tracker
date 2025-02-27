@@ -26,25 +26,28 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Textarea,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useGetUserWorkoutPlan } from "../query/query";
+import { motion } from "framer-motion";
+
 import {
   BODY_PARTS,
   LEVELS,
   WORKOUT_CATEGORIES,
 } from "@src/constants/constants";
-
+const MotionBox = motion(Box);
+const MotionHeading = motion(Heading);
 // Define the workout interface
 interface Workout {
   id: string;
   name: string;
-  force: string;
-  level: string;
-  mechanic?: string;
-  equipment: string;
-  category: string;
-  bodyPart?: string;
+  BodyPart?: string;
+  Title?: string;
+  Level?: string;
+  Equipment?: string;
+  Desc?: string;
 }
 
 // Define the filter state interface
@@ -103,16 +106,14 @@ const AssignWorkout: React.FC = () => {
     Saturday: [],
     Sunday: [],
   });
+  const [selectedDescription, setSelectedDescription] = useState<any>("");
 
   // State for new custom workout form
   const [newWorkout, setNewWorkout] = useState<Omit<Workout, "id">>({
     name: "",
-    force: "",
-    level: "",
-    mechanic: "",
-    equipment: "",
-    category: "",
-    bodyPart: "",
+    Level: "",
+    Equipment: "",
+    BodyPart: "",
   });
 
   const daysOfWeek: string[] = [
@@ -130,10 +131,17 @@ const AssignWorkout: React.FC = () => {
 
   // Modal disclosure for creating custom workout
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenDescModal,
+    onOpen: onOpenDescModal,
+    onClose: onCloseDescModal,
+  } = useDisclosure();
 
   // Handle changes for filter fields.
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ): void => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -203,7 +211,9 @@ const AssignWorkout: React.FC = () => {
 
   // Handle changes in the custom workout modal form.
   const handleNewWorkoutChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setNewWorkout((prev) => ({
@@ -224,13 +234,11 @@ const AssignWorkout: React.FC = () => {
     // Optionally, you could also send this data to an API endpoint.
     // Reset the form.
     setNewWorkout({
+      Title: "",
+      Level: "",
+      Equipment: "",
+      BodyPart: "",
       name: "",
-      force: "",
-      level: "",
-      mechanic: "",
-      equipment: "",
-      category: "",
-      bodyPart: "",
     });
     onClose();
   };
@@ -342,25 +350,57 @@ const AssignWorkout: React.FC = () => {
 
         {results.length > 0 && (
           <Box mt={8}>
-            <Heading size="md" mb={4}>
+            <MotionHeading
+              size="md"
+              mb={4}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               Search Results
-            </Heading>
-            <VStack spacing={4} align="stretch">
-              {results.map((workout) => (
-                <Box
+            </MotionHeading>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+              {results.map((workout, index) => (
+                <MotionBox
                   key={workout.id}
                   borderWidth="1px"
                   borderRadius="md"
                   p={4}
                   bg={cardBg}
-                  boxShadow="sm"
+                  boxShadow="lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  whileHover={{ scale: 1.03 }}
                 >
-                  <Heading size="sm">{workout.name}</Heading>
-                  <Text>Force: {workout.force}</Text>
-                  <Text>Level: {workout.level}</Text>
-                  <Text>Mechanic: {workout.mechanic || "N/A"}</Text>
-                  <Text>Equipment: {workout.equipment}</Text>
-                  <Text>Category: {workout.category}</Text>
+                  <MotionHeading
+                    size="sm"
+                    mb={2}
+                    whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                  >
+                    {workout.name}
+                  </MotionHeading>
+                  <Text>Exercise: {workout.Title}</Text>
+                  <Text>Body Part: {workout.BodyPart}</Text>
+                  <Text>Level: {workout.Level}</Text>
+                  <Text>Equipment: {workout.Equipment}</Text>
+                  {workout.Desc && workout.Desc.length > 100 ? (
+                    <Text>
+                      Description: {workout.Desc.substring(0, 100)}...
+                      <Button
+                        variant="link"
+                        colorScheme="blue"
+                        onClick={() => {
+                          setSelectedDescription(workout.Desc);
+                          onOpenDescModal();
+                        }}
+                      >
+                        Read More
+                      </Button>
+                    </Text>
+                  ) : (
+                    <Text>Description: {workout.Desc}</Text>
+                  )}
                   <HStack mt={2}>
                     <Select
                       placeholder="Select day"
@@ -379,55 +419,105 @@ const AssignWorkout: React.FC = () => {
                       colorScheme="teal"
                       onClick={() => handleAssignWorkout(workout)}
                     >
-                      Assign Workout
+                      Assign
                     </Button>
                   </HStack>
-                </Box>
+                </MotionBox>
               ))}
-            </VStack>
+            </SimpleGrid>
           </Box>
         )}
 
         <Box mt={8}>
-          <Heading size="md" mb={4}>
+          <MotionHeading
+            size="md"
+            mb={4}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
             Assigned Workouts for the Week
-          </Heading>
+          </MotionHeading>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
             {daysOfWeek.map((day) => (
-              <Box
+              <MotionBox
                 key={day}
                 p={4}
                 borderWidth="1px"
                 borderRadius="md"
                 bg={cardBg}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                whileHover={{ scale: 1.03 }}
               >
-                <Heading size="sm" mb={2}>
+                <MotionHeading
+                  size="sm"
+                  mb={2}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                >
                   {day}
-                </Heading>
+                </MotionHeading>
                 {assignedWorkouts[day] && assignedWorkouts[day].length > 0 ? (
-                  assignedWorkouts[day].map((workout) => (
-                    <Box
+                  assignedWorkouts[day].map((workout, index) => (
+                    <MotionBox
                       key={workout.id}
                       borderWidth="1px"
                       borderRadius="md"
                       p={2}
                       mt={2}
                       boxShadow="xs"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.4 }}
+                      whileHover={{ scale: 1.02 }}
                     >
-                      <Text>{workout.name}</Text>
-                      <Text fontSize="sm">Force: {workout.force}</Text>
-                      <Text fontSize="sm">Level: {workout.level}</Text>
-                    </Box>
+                      <Text>Exercise: {workout.Title}</Text>
+                      <Text>Body Part: {workout.BodyPart}</Text>
+                      <Text>Level: {workout.Level}</Text>
+                      <Text>Equipment: {workout.Equipment}</Text>
+                      {workout.Desc && workout.Desc.length > 100 ? (
+                        <Text>
+                          Description: {workout.Desc.substring(0, 100)}...
+                          <Button
+                            variant="link"
+                            colorScheme="blue"
+                            onClick={() => {
+                              setSelectedDescription(workout.Desc);
+                              onOpenDescModal();
+                            }}
+                          >
+                            Read More
+                          </Button>
+                        </Text>
+                      ) : (
+                        <Text>Description: {workout.Desc}</Text>
+                      )}
+                    </MotionBox>
                   ))
                 ) : (
                   <Text>No workouts assigned</Text>
                 )}
-              </Box>
+              </MotionBox>
             ))}
           </SimpleGrid>
         </Box>
       </Box>
-
+      <Modal isOpen={isOpenDescModal} onClose={onCloseDescModal} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Workout Description</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>{selectedDescription}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={onCloseDescModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       {/* Modal for Creating a Custom Workout */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -437,76 +527,61 @@ const AssignWorkout: React.FC = () => {
           <ModalBody>
             <VStack spacing={4} align="stretch">
               <FormControl>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Workout</FormLabel>
                 <Input
                   placeholder="Workout name"
-                  name="name"
-                  value={newWorkout.name}
+                  name="Title"
+                  value={newWorkout.Title}
                   onChange={handleNewWorkoutChange}
                 />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Force</FormLabel>
-                <Select
-                  placeholder="Select force"
-                  name="force"
-                  value={newWorkout.force}
-                  onChange={handleNewWorkoutChange}
-                >
-                  <option value="push">Push</option>
-                  <option value="pull">Pull</option>
-                </Select>
               </FormControl>
               <FormControl>
                 <FormLabel>Level</FormLabel>
                 <Select
                   placeholder="Select level"
-                  name="level"
-                  value={newWorkout.level}
+                  name="Level"
+                  value={newWorkout.Level}
                   onChange={handleNewWorkoutChange}
                 >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
+                  {LEVELS.map((level) => (
+                    <option value={level.value}>{level.label}</option>
+                  ))}
                 </Select>
               </FormControl>
               <FormControl>
-                <FormLabel>Mechanic</FormLabel>
+                <FormLabel>Body Part</FormLabel>
                 <Select
-                  placeholder="Select mechanic"
-                  name="mechanic"
-                  value={newWorkout.mechanic}
+                  placeholder="Select Body Part"
+                  name="BodyPart"
+                  value={newWorkout.BodyPart}
                   onChange={handleNewWorkoutChange}
                 >
-                  <option value="compound">Compound</option>
-                  <option value="isolation">Isolation</option>
+                  {BODY_PARTS.map((bodyPart) => (
+                    <option value={bodyPart.value}>{bodyPart.label}</option>
+                  ))}
                 </Select>
               </FormControl>
               <FormControl>
                 <FormLabel>Equipment</FormLabel>
                 <Select
                   placeholder="Select equipment"
-                  name="equipment"
-                  value={newWorkout.equipment}
+                  name="Equipment"
+                  value={newWorkout.Equipment}
                   onChange={handleNewWorkoutChange}
                 >
-                  <option value="body only">Body Only</option>
-                  <option value="dumbbell">Dumbbell</option>
-                  <option value="barbell">Barbell</option>
+                  {WORKOUT_CATEGORIES.map((equipment) => (
+                    <option value={equipment.value}>{equipment.label}</option>
+                  ))}
                 </Select>
               </FormControl>
               <FormControl>
-                <FormLabel>Category</FormLabel>
-                <Select
-                  placeholder="Select category"
-                  name="category"
-                  value={newWorkout.category}
+                <FormLabel>Desc</FormLabel>
+                <Textarea
+                  placeholder="Enter Description"
+                  value={newWorkout.Desc}
                   onChange={handleNewWorkoutChange}
-                >
-                  <option value="strength">Strength</option>
-                  <option value="stretching">Stretching</option>
-                  <option value="cardio">Cardio</option>
-                </Select>
+                  name="Desc"
+                />
               </FormControl>
             </VStack>
           </ModalBody>
