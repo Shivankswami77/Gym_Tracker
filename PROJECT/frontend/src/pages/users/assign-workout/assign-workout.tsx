@@ -575,45 +575,54 @@ const AssignWorkout: React.FC = () => {
 
                       {/* Additional inputs for sets, reps, wait time */}
                       <HStack spacing={2} mt={2}>
-                        <Input
-                          placeholder="Sets"
-                          type="number"
-                          value={workout.sets ?? ""}
-                          onChange={(e) =>
-                            updateAssignedWorkoutInfo(
-                              day,
-                              workout._id,
-                              "sets",
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                        <Input
-                          placeholder="Reps"
-                          type="number"
-                          value={workout.reps ?? ""}
-                          onChange={(e) =>
-                            updateAssignedWorkoutInfo(
-                              day,
-                              workout._id,
-                              "reps",
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                        <Input
-                          placeholder="Wait Time"
-                          type="number"
-                          value={workout.waitTime ?? ""}
-                          onChange={(e) =>
-                            updateAssignedWorkoutInfo(
-                              day,
-                              workout._id,
-                              "waitTime",
-                              Number(e.target.value)
-                            )
-                          }
-                        />
+                        <FormControl>
+                          <FormLabel>Sets</FormLabel>
+                          <Input
+                            placeholder="Sets"
+                            type="number"
+                            value={workout.sets ?? ""}
+                            onChange={(e) =>
+                              updateAssignedWorkoutInfo(
+                                day,
+                                workout._id,
+                                "sets",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel>Reps</FormLabel>
+                          <Input
+                            placeholder="Reps"
+                            type="number"
+                            value={workout.reps ?? ""}
+                            onChange={(e) =>
+                              updateAssignedWorkoutInfo(
+                                day,
+                                workout._id,
+                                "reps",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel>Wait Time</FormLabel>
+                          <Input
+                            placeholder="Wait Time"
+                            type="number"
+                            value={workout.waitTime ?? ""}
+                            onChange={(e) =>
+                              updateAssignedWorkoutInfo(
+                                day,
+                                workout._id,
+                                "waitTime",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
                       </HStack>
                     </MotionBox>
                   ))
