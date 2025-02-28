@@ -31,6 +31,7 @@ const getCustomizedWorkoutPlan = async (req, res) => {
 
   const total = await Workout.countDocuments(queryObj);
   const results = await Workout.find(queryObj)
+    .sort({ createdDate: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
@@ -41,7 +42,71 @@ const getCustomizedWorkoutPlan = async (req, res) => {
     results,
   });
 };
+const addCustomWorkout = async (req, res) => {
+  // Destructure properties from req.body
+  const { Title, Level, Equipment, BodyPart } = req.body;
 
+  // Check if Title is provided
+  if (!Title) {
+    return res.status(400).json({ message: "Title is required" });
+  }
+
+  // Create a new workout using the provided values
+  const newCustomWorkout = new Workout({
+    Title,
+    Level,
+    Equipment,
+    BodyPart,
+    isCustomWorkout: true,
+  });
+
+  // Check if the workout already exists
+  const workoutAlreadyExists = await Workout.findOne({ Title });
+  if (workoutAlreadyExists) {
+    return res.status(409).json({ message: "Workout Already Exists" });
+  }
+
+  try {
+    const savedWorkout = await newCustomWorkout.save();
+    res.status(200).json({
+      message: "Workout added successfully",
+      workout: savedWorkout,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "An error occurred" });
+  }
+};
+
+const deleteCustomAddedWorkout = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: "ID is required" });
+  }
+
+  try {
+    const workout = await Workout.findById(id);
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    if (!workout.isCustomWorkout) {
+      return res.status(403).json({
+        message: "Deletion not allowed. Only custom workouts can be deleted.",
+      });
+    }
+
+    // Delete the workout
+    await Workout.findByIdAndDelete(id);
+    return res.status(200).json({ message: "Workout deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "An error occurred" });
+  }
+};
 module.exports = {
   getCustomizedWorkoutPlan,
+  addCustomWorkout,
+  deleteCustomAddedWorkout,
 };

@@ -27,9 +27,14 @@ import {
   ModalCloseButton,
   useDisclosure,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
-import { useGetUserWorkoutPlan } from "../query/query";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import {
+  useAddCustomWorkout,
+  useDeleteCustomWorkout,
+  useGetUserWorkoutPlan,
+} from "../query/query";
 import { motion } from "framer-motion";
 
 import {
@@ -37,12 +42,12 @@ import {
   LEVELS,
   WORKOUT_CATEGORIES,
 } from "@src/constants/constants";
+
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
 // Define the workout interface
 interface Workout {
   id: string;
-  name: string;
   BodyPart?: string;
   Title?: string;
   Level?: string;
@@ -74,10 +79,15 @@ interface SelectedDays {
 // Define API response interface
 interface ApiResponse {
   results: Workout[];
+  workout?: any;
 }
 
 const AssignWorkout: React.FC = () => {
+  const toast = useToast();
+
   const { mutate: getUserWorkoutPlan, isLoading } = useGetUserWorkoutPlan();
+  const { mutate: addCustomWorkout } = useAddCustomWorkout();
+  const { mutate: deleteCustomWorkout } = useDeleteCustomWorkout();
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     force: "",
@@ -95,6 +105,8 @@ const AssignWorkout: React.FC = () => {
 
   // State to track the selected day for each workout result
   const [selectedDays, setSelectedDays] = useState<SelectedDays>({});
+  const [selectedCustomWorkoutId, setSelectedCustomWorkoutId] =
+    useState<string>("");
 
   // State to track assigned workouts grouped by day
   const [assignedWorkouts, setAssignedWorkouts] = useState<AssignedWorkouts>({
@@ -110,7 +122,7 @@ const AssignWorkout: React.FC = () => {
 
   // State for new custom workout form
   const [newWorkout, setNewWorkout] = useState<Omit<Workout, "id">>({
-    name: "",
+    Title: "",
     Level: "",
     Equipment: "",
     BodyPart: "",
@@ -135,6 +147,11 @@ const AssignWorkout: React.FC = () => {
     isOpen: isOpenDescModal,
     onOpen: onOpenDescModal,
     onClose: onCloseDescModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteWorkoutModal,
+    onOpen: onOpenDeleteWorkoutModal,
+    onClose: onCloseDeleteWorkoutModal,
   } = useDisclosure();
 
   // Handle changes for filter fields.
@@ -225,12 +242,16 @@ const AssignWorkout: React.FC = () => {
   // Handle submission of the custom workout form.
   const handleCreateWorkout = () => {
     // Create a new workout with a generated id.
-    const workoutToAdd: Workout = {
-      id: Date.now().toString(),
-      ...newWorkout,
-    };
+
+    addCustomWorkout(
+      { newWorkout },
+      {
+        onSuccess: (response: ApiResponse) => {
+          setResults((prev) => [response.workout, ...prev]);
+        },
+      }
+    );
     // Add the new workout to the existing search results.
-    setResults((prev) => [workoutToAdd, ...prev]);
     // Optionally, you could also send this data to an API endpoint.
     // Reset the form.
     setNewWorkout({
@@ -238,11 +259,27 @@ const AssignWorkout: React.FC = () => {
       Level: "",
       Equipment: "",
       BodyPart: "",
-      name: "",
     });
     onClose();
   };
-
+  const handleDeleteCustomWorkout = (id: string) => {
+    deleteCustomWorkout(
+      { id },
+      {
+        onSuccess: (response: ApiResponse) => {
+          toast({
+            title: "Success",
+            description: "Workout has been deleted",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          handleSearch();
+          onCloseDeleteWorkoutModal();
+        },
+      }
+    );
+  };
   return (
     <Container maxW={{ base: "95%", md: "80%", lg: "100%" }} py={8}>
       {/* Creative Header with Add Icon */}
@@ -360,7 +397,7 @@ const AssignWorkout: React.FC = () => {
               Search Results
             </MotionHeading>
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-              {results.map((workout, index) => (
+              {results.map((workout: any, index) => (
                 <MotionBox
                   key={workout.id}
                   borderWidth="1px"
@@ -373,14 +410,27 @@ const AssignWorkout: React.FC = () => {
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                   whileHover={{ scale: 1.03 }}
                 >
-                  <MotionHeading
+                  {/* <MotionHeading
                     size="sm"
                     mb={2}
                     whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
                   >
                     {workout.name}
-                  </MotionHeading>
-                  <Text>Exercise: {workout.Title}</Text>
+                  </MotionHeading> */}
+                  <HStack mt={2} justifyContent={"space-between"}>
+                    <Text>Exercise: {workout.Title}</Text>{" "}
+                    {workout.isCustomWorkout && (
+                      <DeleteIcon
+                        color={"red"}
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSelectedCustomWorkoutId(workout._id);
+                          onOpenDeleteWorkoutModal();
+                        }}
+                      />
+                    )}
+                  </HStack>
+
                   <Text>Body Part: {workout.BodyPart}</Text>
                   <Text>Level: {workout.Level}</Text>
                   <Text>Equipment: {workout.Equipment}</Text>
@@ -591,6 +641,31 @@ const AssignWorkout: React.FC = () => {
             </Button>
             <Button colorScheme="teal" onClick={handleCreateWorkout}>
               Create Workout
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isOpenDeleteWorkoutModal}
+        onClose={onCloseDeleteWorkoutModal}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Workout</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete this workout?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button mr={3} colorScheme="blue" onClick={onCloseDescModal}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="red"
+              onClick={() => handleDeleteCustomWorkout(selectedCustomWorkoutId)}
+            >
+              Delete
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -50,4 +50,43 @@ const useGetUserWorkoutPlan = () => {
     }
   );
 };
-export { useGetAllUsers, useDeleteUser, useGetUserWorkoutPlan };
+const useAddCustomWorkout = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (paylod) => {
+      const response: AxiosResponse<any> = await http.post(
+        URLs.AddCustomWorkout(),
+        paylod.newWorkout
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+const useDeleteCustomWorkout = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (paylod) => {
+      const response: AxiosResponse<any> = await http.delete(
+        URLs.DeleteCustomWorkout(paylod.id)
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+export {
+  useGetAllUsers,
+  useDeleteUser,
+  useGetUserWorkoutPlan,
+  useAddCustomWorkout,
+  useDeleteCustomWorkout,
+};

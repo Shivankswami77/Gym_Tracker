@@ -13,6 +13,8 @@ export const URLs = {
   GetAllUsers: (pageNumber: number, pageLimit: number) =>
     `/api/users/all-users?page=${pageNumber}&limit=${pageLimit}`,
   DeleteUser: (userId: string) => `/api/users/${userId}`,
+  AddCustomWorkout: () => `/api/add-custom-workout`,
+  DeleteCustomWorkout: (id: string) => `/api/delete-custom-workout/${id}`,
 };
 export const baseURL = "http://localhost:4000/";
 class HttpService {

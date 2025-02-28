@@ -6,25 +6,26 @@ const ExerciseSchema = new Schema(
     // MongoDB automatically adds an _id field of type ObjectId.
 
     // A numeric exercise ID, e.g., 2917
-    exerciseId: { type: Number, required: true, unique: true },
+    exerciseId: { type: Number, required: false },
+    isCustomWorkout: { type: Boolean, required: false, default: false },
 
     // Title: e.g., "30 Arms EZ-Bar Skullcrusher"
-    title: { type: String, required: true },
+    Title: { type: String, required: true },
 
     // Description (optional)
-    desc: { type: String },
+    Desc: { type: String },
 
     // Type: e.g., "Strength"
-    type: { type: String, required: true },
+    type: { type: String, required: false },
 
     // BodyPart: e.g., "Triceps"
-    bodyPart: { type: String, required: true },
+    BodyPart: { type: String, required: false },
 
     // Equipment: e.g., "E-Z Curl Bar"
-    equipment: { type: String, required: true },
+    Equipment: { type: String, required: false },
 
     // Level: e.g., "Intermediate"
-    level: { type: String, required: true },
+    Level: { type: String, required: false },
 
     // Rating (optional)
     rating: { type: String },
@@ -32,7 +33,9 @@ const ExerciseSchema = new Schema(
     // Rating description (optional)
     ratingDesc: { type: String },
   },
-  { timestamps: true } // Optional: adds createdAt and updatedAt timestamps
+  {
+    timestamps: { createdAt: "createdDate", updatedAt: "updatedAt" },
+  }
 );
 
 module.exports = mongoose.model(
