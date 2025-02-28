@@ -42,6 +42,7 @@ import {
   LEVELS,
   WORKOUT_CATEGORIES,
 } from "@src/constants/constants";
+import { WorkoutCard } from "@src/components/layout-components/header-nav/gym-components/workout-card/workout-card";
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -209,6 +210,15 @@ const AssignWorkout: React.FC = () => {
         {
           onSuccess: (response: ApiResponse) => {
             setResults(response.results);
+            if (response.results?.length === 0) {
+              toast({
+                title: "Error",
+                description: "No records found for the searched criteria",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+              });
+            }
           },
         }
       );
@@ -446,61 +456,35 @@ const AssignWorkout: React.FC = () => {
                   >
                     {workout.name}
                   </MotionHeading> */}
-                  <HStack mt={2} justifyContent={"space-between"}>
-                    <Text>Exercise: {workout.Title}</Text>{" "}
-                    {workout.isCustomWorkout && (
-                      <DeleteIcon
-                        color={"red"}
-                        cursor={"pointer"}
-                        onClick={() => {
-                          setSelectedCustomWorkoutId(workout._id);
-                          onOpenDeleteWorkoutModal();
-                        }}
-                      />
-                    )}
-                  </HStack>
-
-                  <Text>Body Part: {workout.BodyPart}</Text>
-                  <Text>Level: {workout.Level}</Text>
-                  <Text>Equipment: {workout.Equipment}</Text>
-                  {workout.Desc && workout.Desc.length > 100 ? (
-                    <Text>
-                      Description: {workout.Desc.substring(0, 100)}...
-                      <Button
-                        variant="link"
-                        colorScheme="blue"
-                        onClick={() => {
-                          setSelectedDescription(workout.Desc);
-                          onOpenDescModal();
-                        }}
+                  <WorkoutCard
+                    workout={workout}
+                    setSelectedCustomWorkoutId={setSelectedCustomWorkoutId}
+                    onOpenDeleteWorkoutModal={onOpenDeleteWorkoutModal}
+                    onOpenDescModal={onOpenDescModal}
+                    setSelectedDescription={setSelectedDescription}
+                  >
+                    <HStack>
+                      <Select
+                        placeholder="Select day"
+                        value={selectedDays[workout._id] || ""}
+                        onChange={(e) =>
+                          handleDayChange(workout._id, e.target.value)
+                        }
                       >
-                        Read More
+                        {daysOfWeek.map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ))}
+                      </Select>
+                      <Button
+                        colorScheme="teal"
+                        onClick={() => handleAssignWorkout(workout)}
+                      >
+                        Assign
                       </Button>
-                    </Text>
-                  ) : (
-                    <Text>Description: {workout.Desc}</Text>
-                  )}
-                  <HStack mt={2}>
-                    <Select
-                      placeholder="Select day"
-                      value={selectedDays[workout._id] || ""}
-                      onChange={(e) =>
-                        handleDayChange(workout._id, e.target.value)
-                      }
-                    >
-                      {daysOfWeek.map((day) => (
-                        <option key={day} value={day}>
-                          {day}
-                        </option>
-                      ))}
-                    </Select>
-                    <Button
-                      colorScheme="teal"
-                      onClick={() => handleAssignWorkout(workout)}
-                    >
-                      Assign
-                    </Button>
-                  </HStack>
+                    </HStack>
+                  </WorkoutCard>
                 </MotionBox>
               ))}
             </SimpleGrid>
