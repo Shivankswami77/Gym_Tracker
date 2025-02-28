@@ -49,7 +49,7 @@ const MotionIconButton = motion(IconButton);
 
 // Define the workout interface
 interface Workout {
-  id: string;
+  _id: string;
   BodyPart?: string;
   Title?: string;
   Level?: string;
@@ -123,7 +123,7 @@ const AssignWorkout: React.FC = () => {
   const [selectedDescription, setSelectedDescription] = useState<any>("");
 
   // State for new custom workout form
-  const [newWorkout, setNewWorkout] = useState<Omit<Workout, "id">>({
+  const [newWorkout, setNewWorkout] = useState<Omit<Workout, "_id">>({
     Title: "",
     Level: "",
     Equipment: "",
@@ -139,7 +139,19 @@ const AssignWorkout: React.FC = () => {
     "Saturday",
     "Sunday",
   ];
-
+  const handleResetFilters = () => {
+    setFilters({
+      search: "",
+      force: "",
+      level: "",
+      mechanic: "",
+      equipment: "",
+      category: "",
+      bodyPart: "",
+    });
+    // Optionally, clear selected days as well if needed:
+    setSelectedDays({});
+  };
   // Responsive color for cards
   const cardBg = useColorModeValue("white", "gray.700");
 
@@ -210,7 +222,7 @@ const AssignWorkout: React.FC = () => {
 
   // Assign the selected workout to the chosen day.
   const handleAssignWorkout = (workout: Workout): void => {
-    const selectedDay = selectedDays[workout.id];
+    const selectedDay = selectedDays[workout._id];
     if (!selectedDay) {
       alert("Please select a day of the week for this workout.");
       return;
@@ -225,7 +237,7 @@ const AssignWorkout: React.FC = () => {
       };
     });
     // Clear the day selection for the workout after assignment.
-    setSelectedDays((prev) => ({ ...prev, [workout.id]: "" }));
+    setSelectedDays((prev) => ({ ...prev, [workout._id]: "" }));
   };
 
   // Handle changes in the custom workout modal form.
@@ -317,17 +329,16 @@ const AssignWorkout: React.FC = () => {
           Search Workout Plans
         </Heading>
         <VStack spacing={4} align="stretch">
-          <FormControl>
-            <FormLabel>Search</FormLabel>
-            <Input
-              placeholder="Search by name or instructions"
-              name="search"
-              value={filters.search}
-              onChange={handleInputChange}
-            />
-          </FormControl>
-
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+            <FormControl>
+              <FormLabel>Search</FormLabel>
+              <Input
+                placeholder="Search by name or instructions"
+                name="search"
+                value={filters.search}
+                onChange={handleInputChange}
+              />
+            </FormControl>
             <FormControl>
               <FormLabel>Body Part</FormLabel>
               <Select
@@ -341,7 +352,9 @@ const AssignWorkout: React.FC = () => {
                 ))}
               </Select>
             </FormControl>
+          </SimpleGrid>
 
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
             <FormControl>
               <FormLabel>Level</FormLabel>
               <Select
@@ -355,9 +368,6 @@ const AssignWorkout: React.FC = () => {
                 ))}
               </Select>
             </FormControl>
-          </SimpleGrid>
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
             <FormControl>
               <FormLabel>Equipment</FormLabel>
               <Select
@@ -373,14 +383,23 @@ const AssignWorkout: React.FC = () => {
             </FormControl>
           </SimpleGrid>
 
-          <Button
-            colorScheme="blue"
-            onClick={handleSearch}
-            isLoading={isLoading}
-            loadingText="Searching..."
-          >
-            Search Workout Plans
-          </Button>
+          <HStack spacing={4}>
+            <Button
+              colorScheme="blue"
+              onClick={handleSearch}
+              isLoading={isLoading}
+              loadingText="Searching..."
+            >
+              Search Workout Plans
+            </Button>
+            <Button
+              onClick={handleResetFilters}
+              colorScheme="gray"
+              variant="outline"
+            >
+              Reset Filters
+            </Button>
+          </HStack>
         </VStack>
 
         {loading && (
@@ -409,7 +428,7 @@ const AssignWorkout: React.FC = () => {
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
               {results.map((workout: any, index) => (
                 <MotionBox
-                  key={workout.id}
+                  key={workout._id}
                   borderWidth="1px"
                   borderRadius="md"
                   p={4}
@@ -464,9 +483,9 @@ const AssignWorkout: React.FC = () => {
                   <HStack mt={2}>
                     <Select
                       placeholder="Select day"
-                      value={selectedDays[workout.id] || ""}
+                      value={selectedDays[workout._id] || ""}
                       onChange={(e) =>
-                        handleDayChange(workout.id, e.target.value)
+                        handleDayChange(workout._id, e.target.value)
                       }
                     >
                       {daysOfWeek.map((day) => (
@@ -521,7 +540,7 @@ const AssignWorkout: React.FC = () => {
                 {assignedWorkouts[day] && assignedWorkouts[day].length > 0 ? (
                   assignedWorkouts[day].map((workout, index) => (
                     <MotionBox
-                      key={workout.id}
+                      key={workout._id}
                       borderWidth="1px"
                       borderRadius="md"
                       p={2}
