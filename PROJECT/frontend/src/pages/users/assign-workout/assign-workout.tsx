@@ -28,6 +28,9 @@ import {
   useDisclosure,
   Textarea,
   useToast,
+  Wrap,
+  WrapItem,
+  Avatar,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
@@ -43,6 +46,8 @@ import {
   WORKOUT_CATEGORIES,
 } from "@src/constants/constants";
 import { WorkoutCard } from "@src/components/layout-components/header-nav/gym-components/workout-card/workout-card";
+import UserDetailCard from "@src/components/layout-components/header-nav/gym-components/user-detail-card/user-detail-card";
+import { useParams } from "react-router-dom";
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -87,7 +92,7 @@ interface ApiResponse {
 
 const AssignWorkout: React.FC = () => {
   const toast = useToast();
-
+  const params = useParams();
   const { mutate: getUserWorkoutPlan, isLoading } = useGetUserWorkoutPlan();
   const { mutate: addCustomWorkout } = useAddCustomWorkout();
   const { mutate: deleteCustomWorkout } = useDeleteCustomWorkout();
@@ -316,8 +321,10 @@ const AssignWorkout: React.FC = () => {
         justify="space-between"
       >
         <Box textAlign="center">
+          <UserDetailCard userId={params.id} />
+
           <Heading color="white" fontSize={{ base: "2xl", md: "3xl" }}>
-            Build Your Weekly Workout Plan
+            Build Weekly Workout Plan
           </Heading>
           <Text color="whiteAlpha.900" mt={2}>
             Search, assign, and stay motivated!
