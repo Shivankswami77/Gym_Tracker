@@ -45,6 +45,8 @@ import {
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
+const MotionIconButton = motion(IconButton);
+
 // Define the workout interface
 interface Workout {
   id: string;
@@ -299,11 +301,14 @@ const AssignWorkout: React.FC = () => {
             Search, assign, and stay motivated!
           </Text>
         </Box>
-        <IconButton
+        <MotionIconButton
           aria-label="Add custom workout"
           icon={<AddIcon />}
           colorScheme="teal"
           onClick={onOpen}
+          initial={{ scale: 0, opacity: 0, rotate: -180 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
         />
       </Flex>
 
@@ -368,7 +373,12 @@ const AssignWorkout: React.FC = () => {
             </FormControl>
           </SimpleGrid>
 
-          <Button colorScheme="blue" onClick={handleSearch}>
+          <Button
+            colorScheme="blue"
+            onClick={handleSearch}
+            isLoading={isLoading}
+            loadingText="Searching..."
+          >
             Search Workout Plans
           </Button>
         </VStack>
