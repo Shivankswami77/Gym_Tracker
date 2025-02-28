@@ -309,6 +309,14 @@ const AssignWorkout: React.FC = () => {
       }
     );
   };
+
+  const handleRemoveAssignedWorkout = (day: string, workoutId: string) => {
+    setAssignedWorkouts((prev) => ({
+      ...prev,
+      [day]: prev[day].filter((workout) => workout._id !== workoutId),
+    }));
+  };
+
   return (
     <Container maxW={{ base: "95%", md: "80%", lg: "100%" }} py={8}>
       {/* Creative Header with Add Icon */}
@@ -521,49 +529,34 @@ const AssignWorkout: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 whileHover={{ scale: 1.03 }}
               >
-                <MotionHeading
-                  size="sm"
-                  mb={2}
-                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                >
+                <Heading size="sm" mb={2}>
                   {day}
-                </MotionHeading>
+                </Heading>
                 {assignedWorkouts[day] && assignedWorkouts[day].length > 0 ? (
                   assignedWorkouts[day].map((workout, index) => (
-                    <MotionBox
+                    <Box
                       key={workout._id}
                       borderWidth="1px"
                       borderRadius="md"
                       p={2}
                       mt={2}
                       boxShadow="xs"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.4 }}
-                      whileHover={{ scale: 1.02 }}
                     >
-                      <Text>Exercise: {workout.Title}</Text>
+                      <HStack mt={2} justifyContent={"space-between"}>
+                        {" "}
+                        <Text fontWeight="bold">{workout.Title}</Text>
+                        <DeleteIcon
+                          color={"red"}
+                          cursor={"pointer"}
+                          onClick={() =>
+                            handleRemoveAssignedWorkout(day, workout._id)
+                          }
+                        />
+                      </HStack>
+
                       <Text>Body Part: {workout.BodyPart}</Text>
                       <Text>Level: {workout.Level}</Text>
-                      <Text>Equipment: {workout.Equipment}</Text>
-                      {workout.Desc && workout.Desc.length > 100 ? (
-                        <Text>
-                          Description: {workout.Desc.substring(0, 100)}...
-                          <Button
-                            variant="link"
-                            colorScheme="blue"
-                            onClick={() => {
-                              setSelectedDescription(workout.Desc);
-                              onOpenDescModal();
-                            }}
-                          >
-                            Read More
-                          </Button>
-                        </Text>
-                      ) : (
-                        <Text>Description: {workout.Desc}</Text>
-                      )}
-                    </MotionBox>
+                    </Box>
                   ))
                 ) : (
                   <Text>No workouts assigned</Text>
