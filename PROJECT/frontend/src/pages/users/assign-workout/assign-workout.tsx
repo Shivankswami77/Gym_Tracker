@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -32,8 +32,10 @@ import {
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   useAddCustomWorkout,
+  useAssignWorkoutPlanToUser,
   useDeleteCustomWorkout,
   useGetUserWorkoutPlan,
+  useGetUserWorkoutPlanById, // <-- new hook for getting workout plan by id
 } from "../query/query";
 import { motion } from "framer-motion";
 import {
@@ -50,7 +52,6 @@ const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
 const MotionIconButton = motion(IconButton);
 
-// Extend the workout interface to include assignment details.
 interface Workout {
   _id: string;
   BodyPart?: string;
@@ -81,38 +82,29 @@ interface AssignedWorkouts {
   [key: string]: AssignedWorkout[];
 }
 
-interface SelectedDays {
-  [key: string]: string;
-}
-
-interface ApiResponse {
-  results: Workout[];
-  workout?: any;
-}
-
 const AssignWorkout: React.FC = () => {
   const toast = useToast();
   const params = useParams();
+  const userId = params.id; // assume this is the user id from route params
+
+  // API hooks
+  const { mutate: getUserWorkoutPlanById } = useGetUserWorkoutPlanById();
   const { mutate: getUserWorkoutPlan, isLoading } = useGetUserWorkoutPlan();
   const { mutate: addCustomWorkout } = useAddCustomWorkout();
   const { mutate: deleteCustomWorkout } = useDeleteCustomWorkout();
+  const { mutate: assignWorkoutPlanToUser } = useAssignWorkoutPlanToUser();
 
-  // States for filters and search results.
-  const [filters, setFilters] = useState<FilterState>({
-    search: "",
-    force: "",
-    level: "",
-    mechanic: "",
-    equipment: "",
-    category: "",
-    bodyPart: "",
+  // State for workout plan - prefilled from API
+  const [workoutPlan, setWorkoutPlan] = useState<AssignedWorkouts>({
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+    Sunday: [],
   });
-  const [results, setResults] = useState<Workout[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [selectedDays, setSelectedDays] = useState<SelectedDays>({});
-  const [selectedCustomWorkoutId, setSelectedCustomWorkoutId] =
-    useState<string>("");
+  // We use this state for our assigned workouts UI
   const [assignedWorkouts, setAssignedWorkouts] = useState<AssignedWorkouts>({
     Monday: [],
     Tuesday: [],
@@ -122,12 +114,29 @@ const AssignWorkout: React.FC = () => {
     Saturday: [],
     Sunday: [],
   });
+  const [results, setResults] = useState<Workout[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [selectedDays, setSelectedDays] = useState<{ [key: string]: string }>(
+    {}
+  );
+  const [selectedCustomWorkoutId, setSelectedCustomWorkoutId] =
+    useState<string>("");
   const [selectedDescription, setSelectedDescription] = useState<string>("");
   const [newWorkout, setNewWorkout] = useState<Omit<Workout, "_id">>({
     Title: "",
     Level: "",
     Equipment: "",
     BodyPart: "",
+  });
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    force: "",
+    level: "",
+    mechanic: "",
+    equipment: "",
+    category: "",
+    bodyPart: "",
   });
 
   const daysOfWeek: string[] = [
@@ -153,6 +162,29 @@ const AssignWorkout: React.FC = () => {
     onOpen: onOpenDeleteWorkoutModal,
     onClose: onCloseDeleteWorkoutModal,
   } = useDisclosure();
+
+  // Fetch the user's workout plan when the component mounts
+  useEffect(() => {
+    if (userId) {
+      setLoading(true);
+      getUserWorkoutPlanById(
+        { userId },
+        {
+          onSuccess: (response: any) => {
+            if (response) {
+              setWorkoutPlan(response);
+              setAssignedWorkouts(response);
+            }
+            setLoading(false);
+          },
+          onError: (err: any) => {
+            setError("Failed to fetch workout plan.");
+            setLoading(false);
+          },
+        }
+      );
+    }
+  }, [userId, getUserWorkoutPlanById]);
 
   // Reset filters
   const handleResetFilters = () => {
@@ -199,8 +231,8 @@ const AssignWorkout: React.FC = () => {
       getUserWorkoutPlan(
         { url: `/api/workouts?${queryParams.toString()}` },
         {
-          onSuccess: (response: ApiResponse) => {
-            setResults(response.results);
+          onSuccess: (response: any) => {
+            setResults(response.results || []);
             if (response.results?.length === 0) {
               toast({
                 title: "Error",
@@ -283,7 +315,7 @@ const AssignWorkout: React.FC = () => {
     addCustomWorkout(
       { newWorkout },
       {
-        onSuccess: (response: ApiResponse) => {
+        onSuccess: (response: any) => {
           setResults((prev) => [response.workout, ...prev]);
         },
       }
@@ -302,7 +334,7 @@ const AssignWorkout: React.FC = () => {
     deleteCustomWorkout(
       { id },
       {
-        onSuccess: (response: ApiResponse) => {
+        onSuccess: (response: any) => {
           toast({
             title: "Success",
             description: "Workout has been deleted",
@@ -312,6 +344,24 @@ const AssignWorkout: React.FC = () => {
           });
           handleSearch();
           onCloseDeleteWorkoutModal();
+        },
+      }
+    );
+  };
+
+  const assignFinalWorkoutPlanToUser = () => {
+    console.log(assignedWorkouts, "Final Assigned Workouts");
+    assignWorkoutPlanToUser(
+      { userId, assignedWorkouts },
+      {
+        onSuccess: (response: any) => {
+          toast({
+            title: "Success",
+            description: "Workout plan assigned to user successfully",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
         },
       }
     );
@@ -329,7 +379,7 @@ const AssignWorkout: React.FC = () => {
         justify="space-between"
       >
         <Box textAlign="center">
-          <UserDetailCard userId={params.id} />
+          <UserDetailCard userId={userId} />
           <Heading color="white" fontSize={{ base: "2xl", md: "3xl" }}>
             Build Weekly Workout Plan
           </Heading>
@@ -471,13 +521,6 @@ const AssignWorkout: React.FC = () => {
                   transition={{ delay: index * 0.1, duration: 0.4 }}
                   whileHover={{ scale: 1.03 }}
                 >
-                  {/* <MotionHeading
-                    size="sm"
-                    mb={2}
-                    whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                  >
-                    {workout.name}
-                  </MotionHeading> */}
                   <WorkoutCard
                     workout={workout}
                     setSelectedCustomWorkoutId={setSelectedCustomWorkoutId}
@@ -533,13 +576,9 @@ const AssignWorkout: React.FC = () => {
                 borderRadius="md"
                 bg={cardBg}
               >
-                <MotionHeading
-                  size="sm"
-                  mb={2}
-                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                >
+                <Heading size="sm" mb={2}>
                   {day}
-                </MotionHeading>
+                </Heading>
                 {assignedWorkouts[day] && assignedWorkouts[day].length > 0 ? (
                   assignedWorkouts[day].map((workout, index) => (
                     <MotionBox
@@ -572,8 +611,6 @@ const AssignWorkout: React.FC = () => {
                       <Text>Body Part: {workout.BodyPart}</Text>
                       <Text>Level: {workout.Level}</Text>
                       <Text>Equipment: {workout.Equipment}</Text>
-
-                      {/* Additional inputs for sets, reps, wait time */}
                       <HStack spacing={2} mt={2}>
                         <FormControl>
                           <FormLabel>Sets</FormLabel>
@@ -631,6 +668,9 @@ const AssignWorkout: React.FC = () => {
                 )}
               </Box>
             ))}
+            <Button colorScheme="blue" onClick={assignFinalWorkoutPlanToUser}>
+              Submit Workout Plan
+            </Button>
           </SimpleGrid>
         </Box>
       </Box>

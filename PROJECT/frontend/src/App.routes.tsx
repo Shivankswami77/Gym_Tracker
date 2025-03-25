@@ -16,6 +16,7 @@ import SignUp from "./pages/auth/sign-up";
 import MyProfile from "./pages/my-profile/my-profile";
 import UsersList from "./pages/users/users-list";
 import AssignWorkout from "./pages/users/assign-workout/assign-workout";
+import UserStats from "./pages/users/user-stats/user-stats";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,15 @@ const App: React.FC = () => {
                   <>
                     <HeaderNav />
                     <AssignWorkout />
+                  </>
+                }
+              />
+              <Route
+                path="/user-stats/:id"
+                element={
+                  <>
+                    <HeaderNav />
+                    <UserStats />
                   </>
                 }
               />

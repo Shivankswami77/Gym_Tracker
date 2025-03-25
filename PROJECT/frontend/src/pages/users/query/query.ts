@@ -83,10 +83,67 @@ const useDeleteCustomWorkout = () => {
     }
   );
 };
+
+const useAssignWorkoutPlanToUser = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (payload) => {
+      console.log(payload, "payloadpayload");
+      const { userId, ...rest } = payload;
+      const response: AxiosResponse<any> = await http.post(
+        URLs.AssignWorkoutPlanToUser(userId),
+        rest
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+
+export const useGetUserWorkoutPlanById = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (payload) => {
+      const response: AxiosResponse<any> = await http.get(
+        URLs.UserWorkoutPlanById(payload.userId)
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+const useUpdateUserStatsWorkoutPlanById = () => {
+  return useMutation<any, AxiosError<ErrorResponse>, any>(
+    async (payload) => {
+      const response: AxiosResponse<any> = await http.post(
+        URLs.UpdateUserStatsWorkoutPlanById,
+        payload
+      );
+      return response;
+    },
+    {
+      onError: (error: AxiosError<ErrorResponse>) => {
+        console.log(error);
+        toast("Something Went Wrong!");
+      },
+    }
+  );
+};
+
 export {
   useGetAllUsers,
   useDeleteUser,
   useGetUserWorkoutPlan,
   useAddCustomWorkout,
   useDeleteCustomWorkout,
+  useAssignWorkoutPlanToUser,
+  useUpdateUserStatsWorkoutPlanById,
 };

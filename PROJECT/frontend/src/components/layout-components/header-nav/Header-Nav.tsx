@@ -23,6 +23,7 @@ import {
   MenuDivider,
   MenuItem,
   Link,
+  Image,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -35,6 +36,7 @@ import { useEffect } from "react";
 import useAuthStore from "@src/store/authStore";
 import { Link as RouterLink } from "react-router-dom";
 import RoleTag from "./gym-components/role-tag";
+import logo from "@src/assets/images/download.png";
 
 export default function HeaderNav() {
   const titleColor = useColorModeValue("teal.300", "teal.200");
@@ -82,7 +84,7 @@ export default function HeaderNav() {
             fontFamily={"heading"}
             color={useColorModeValue("gray.800", "white")}
           >
-            Logo
+            <Image src={logo} alt="Logo" boxSize="30px" />
           </Text>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>

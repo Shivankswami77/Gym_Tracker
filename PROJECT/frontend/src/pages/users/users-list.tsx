@@ -114,6 +114,9 @@ const UsersList: React.FC = () => {
               >
                 Assign Workout
               </MenuItem>
+              <MenuItem onClick={() => navigate(`/user-stats/${item._id}`)}>
+                User Stats
+              </MenuItem>
               <MenuItem onClick={() => handleDeleteClick(item._id)}>
                 Delete
               </MenuItem>

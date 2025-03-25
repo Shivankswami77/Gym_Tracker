@@ -15,6 +15,9 @@ export const URLs = {
   DeleteUser: (userId: string) => `/api/users/${userId}`,
   AddCustomWorkout: () => `/api/add-custom-workout`,
   DeleteCustomWorkout: (id: string) => `/api/delete-custom-workout/${id}`,
+  AssignWorkoutPlanToUser: (id: string) => `/api/assign-workout-plan/${id}`,
+  UserWorkoutPlanById: (id: string) => `/api/user-workout-plan/${id}`,
+  UpdateUserStatsWorkoutPlanById: `/api/workout-plans/submit`,
 };
 export const baseURL = "http://localhost:4000/";
 class HttpService {
