@@ -44,7 +44,7 @@ import {
   WORKOUT_CATEGORIES,
 } from "@src/constants/constants";
 import UserDetailCard from "@src/components/layout-components/header-nav/gym-components/user-detail-card/user-detail-card";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { WorkoutCard } from "@src/components/layout-components/header-nav/gym-components/workout-card/workout-card";
 
 // Create motion-enabled components
@@ -86,6 +86,7 @@ const AssignWorkout: React.FC = () => {
   const toast = useToast();
   const params = useParams();
   const userId = params.id; // assume this is the user id from route params
+  const navigate = useNavigate();
 
   // API hooks
   const { mutate: getUserWorkoutPlanById } = useGetUserWorkoutPlanById();
@@ -668,9 +669,17 @@ const AssignWorkout: React.FC = () => {
                 )}
               </Box>
             ))}
-            <Button colorScheme="blue" onClick={assignFinalWorkoutPlanToUser}>
-              Submit Workout Plan
-            </Button>
+            <HStack justifyContent="flex-start">
+              <Button colorScheme="blue" onClick={assignFinalWorkoutPlanToUser}>
+                Submit Workout Plan
+              </Button>
+              <Button
+                colorScheme="teal"
+                onClick={() => navigate(`/user-stats/${userId}`)}
+              >
+                View User Workout Plan
+              </Button>
+            </HStack>
           </SimpleGrid>
         </Box>
       </Box>
